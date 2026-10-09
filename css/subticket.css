@@ -1,0 +1,24 @@
+/* subticket: na lateral do chamado, mostrar título e ID do chamado relacionado
+   (o layout nativo corta tudo e deixa só a bolinha de status em colunas estreitas). */
+.row:has(> .col-auto > i.fa-link) {
+    flex-wrap: wrap;
+    row-gap: .15rem;
+}
+.row:has(> .col-auto > i.fa-link) > .col-auto:last-child {
+    order: 2;
+    margin-left: auto;
+}
+.row:has(> .col-auto > i.fa-link) > .col.text-truncate {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+.row:has(> .col-auto > i.fa-link) > .col.text-truncate > a {
+    display: block;
+    width: 100%;
+    white-space: normal !important;
+    overflow: visible !important;
+}
