@@ -2,7 +2,7 @@
 
 use Glpi\Plugin\Hooks;
 
-define('PLUGIN_SUBTICKET_VERSION', '0.5.0');
+define('PLUGIN_SUBTICKET_VERSION', '0.5.1');
 define('PLUGIN_SUBTICKET_MIN_GLPI', '10.0.0');
 define('PLUGIN_SUBTICKET_MAX_GLPI', '10.1.0');
 

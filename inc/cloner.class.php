@@ -246,7 +246,7 @@ class PluginSubticketCloner extends CommonGLPI
             }
             $restore['name']     = $title; // restaurado do original + prefixo
             $restore['date_mod'] = $_SESSION['glpi_currenttime'];
-            $DB->update('glpi_tickets', $restore, ['id' => $new_id]);
+            $DB->update('glpi_tickets', self::escape($restore), ['id' => $new_id]);
 
             // 7) Vínculo clone <-> original ("Vinculado a")
             $link = new Ticket_Ticket();
@@ -300,6 +300,18 @@ class PluginSubticketCloner extends CommonGLPI
         return $title;
     }
 
+    /**
+     * Escapa valores lidos do banco antes de regravá-los.
+     *
+     * No GLPI 10, DBmysql::insert()/update() NÃO escapam strings: esperam
+     * dados já tratados, como os que chegam do $_POST. O clone nativo
+     * (Clonable::clone) faz o mesmo com Toolbox::addslashes_deep().
+     */
+    private static function escape(array $row): array
+    {
+        return Toolbox::addslashes_deep($row);
+    }
+
     private static function copyRows(
         string $table,
         array $where,
@@ -324,7 +336,7 @@ class PluginSubticketCloner extends CommonGLPI
                 }
             }
 
-            if (!$DB->insert($table, $new_row)) {
+            if (!$DB->insert($table, self::escape($new_row))) {
                 throw new \RuntimeException("Falha ao copiar linha de $table");
             }
             $map[$old_id] = $DB->insertId();

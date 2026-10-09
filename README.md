@@ -4,7 +4,7 @@ Cria **SubChamados** a partir de um chamado: cópias completas, com todo o hist�
 
 | | |
 |---|---|
-| **Versão** | 0.5.0 |
+| **Versão** | 0.5.1 |
 | **GLPI** | 10.0.x |
 | **PHP** | 8.1 ou superior |
 | **Licença** | GPLv2+ |
@@ -58,7 +58,6 @@ As opções são constantes em `inc/cloner.class.php`:
 
 ## Limitações conhecidas
 
-- **Apóstrofos quebram a cópia.** Se o título, a descrição ou algum acompanhamento tiver `'`, a criação do SubChamado falha. Atualize para a versão mais recente.
 - Dados de **outros plugins** (campos adicionais, pesquisas de satisfação etc.) não são copiados.
 - Validações pendentes são copiadas como pendentes, sem notificar o validador.
 - O tempo gasto (`actiontime`) é copiado, então aparece somado em dobro nas estatísticas.
