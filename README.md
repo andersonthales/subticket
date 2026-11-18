@@ -38,6 +38,14 @@ A aba aparece apenas para quem usa a **interface padrão** (não o Self-Service)
 
 Cada SubChamado é criado numa **transação**: se algo falhar, nada daquele SubChamado fica gravado.
 
+### Quem cria o SubChamado
+
+O usuário que clica em **Criar SubChamado** é incluído como **observador** do novo chamado, com notificações ligadas. Se ele já era observador no chamado original, não é incluído de novo. Como nenhuma notificação é enviada no momento do clone, ele passa a receber só as atualizações seguintes.
+
+### Campos adicionais
+
+Com o plugin [Fields](https://github.com/pluginsGLPI/fields) instalado, os valores de **todos os blocos de chamado** (tabelas `glpi_plugin_fields_ticket*`) são copiados do original. Se o GLPI tiver criado uma linha vazia para o SubChamado, ela é substituída pela cópia. Um bloco novo passa a ser copiado sem mudar o plugin. Sem o Fields, esse passo é ignorado.
+
 ## Instalação
 
 ```bash
@@ -47,6 +55,27 @@ chown -R www-data:www-data subticket
 ```
 
 Em **Configurar → Plugins**, clique em **Instalar** e depois em **Ativar**. O plugin não cria tabelas.
+
+Pelo terminal:
+
+```bash
+cd /var/www/html/glpi
+sudo -u www-data php bin/console plugin:install -n -u glpi subticket
+sudo -u www-data php bin/console plugin:activate subticket
+```
+
+## Atualização
+
+1. Substitua os arquivos da pasta `plugins/subticket` (ou `git pull`).
+2. **Espere alguns segundos** se o PHP usar opcache com `validate_timestamps` (o padrão confere os arquivos a cada `revalidate_freq` segundos). Uma requisição que ainda leia o `setup.php` antigo marca o plugin como "a atualizar" de novo.
+3. Reinstale e ative. Toda troca de versão desativa o plugin até esse passo:
+
+```bash
+sudo -u www-data php bin/console plugin:install --force -n -u glpi subticket
+sudo -u www-data php bin/console plugin:activate subticket
+```
+
+Não há migração de banco entre versões.
 
 ## Ajustes
 
@@ -60,7 +89,8 @@ As opções são constantes em `inc/cloner.class.php`:
 
 ## Limitações conhecidas
 
-- Dados de **outros plugins** (pesquisas de satisfação etc.) não são copiados; os campos adicionais do plugin fields são.
+- Dados de **outros plugins** (pesquisas de satisfação etc.) não são copiados; os campos adicionais do plugin Fields são.
+- Blocos do Fields ligados a **tarefas ou acompanhamentos** não são copiados, só os do próprio chamado.
 - Validações pendentes são copiadas como pendentes, sem notificar o validador.
 - O tempo gasto (`actiontime`) é copiado, então aparece somado em dobro nas estatísticas.
 
