@@ -120,9 +120,10 @@ class PluginSubticketCloner extends CommonGLPI
         echo '<p>Cria um novo chamado com título <strong>' . htmlspecialchars(self::TITLE_PREFIX, ENT_QUOTES)
             . '&lt;título do chamado atual&gt;</strong> e <strong>status Em atendimento</strong>, copiando todo o histórico '
             . '(acompanhamentos, tarefas, solução, validações, custos, ativos, documentos e atores) '
-            . 'do chamado atual, preservando autores e datas originais.</p>';
+            . 'e os campos adicionais do chamado atual, preservando autores e datas originais.</p>';
         echo '<ul>';
         echo '<li>SLA/OLA reiniciados a partir da abertura do clone</li>';
+        echo '<li>Você entra como observador do SubChamado</li>';
         echo '<li>Nenhuma notificação é enviada ao clonar</li>';
         echo '<li>SubChamado vinculado automaticamente ao chamado original ("Relacionado a")</li>';
         echo '</ul>';
@@ -201,6 +202,21 @@ class PluginSubticketCloner extends CommonGLPI
             // 3) Copia atores, ativos e custos do original
             foreach (self::TICKET_TABLES as $table) {
                 self::copyRows($table, ['tickets_id' => $source_id], ['tickets_id' => $new_id]);
+            }
+
+            // 3a) Quem cria o SubChamado entra como observador
+            $me       = (int) Session::getLoginUserID();
+            $observer = ['tickets_id' => $new_id, 'users_id' => $me, 'type' => CommonITILActor::OBSERVER];
+            if ($me > 0 && !countElementsInTable('glpi_tickets_users', $observer)) {
+                if (!$DB->insert('glpi_tickets_users', $observer + ['use_notification' => 1])) {
+                    throw new \RuntimeException('Falha ao incluir você como observador');
+                }
+            }
+
+            // 3b) Campos adicionais (plugin fields): troca o que o add() gerou pelos valores do original
+            foreach (self::fieldsTables() as $table) {
+                $DB->delete($table, ['itemtype' => 'Ticket', 'items_id' => $new_id]);
+                self::copyRows($table, ['itemtype' => 'Ticket', 'items_id' => $source_id], ['items_id' => $new_id]);
             }
 
             // 4) Histórico completo (autores e datas preservados)
@@ -342,6 +358,18 @@ class PluginSubticketCloner extends CommonGLPI
             $map[$old_id] = $DB->insertId();
         }
         return $map;
+    }
+
+    /** Tabelas do plugin fields com blocos de chamado (uma por bloco); vazia sem o plugin. */
+    private static function fieldsTables(): array
+    {
+        global $DB;
+
+        $tables = [];
+        foreach ($DB->listTables('glpi\_plugin\_fields\_ticket%') as $row) {
+            $tables[] = $row['TABLE_NAME'];
+        }
+        return $tables;
     }
 
     private static function copyDocuments(string $itemtype, array $id_map): void
