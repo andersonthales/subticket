@@ -4,7 +4,7 @@ Cria **SubChamados** a partir de um chamado: cópias completas, com todo o hist�
 
 | | |
 |---|---|
-| **Versão** | 0.5.1 |
+| **Versão** | 1.1.0 |
 | **GLPI** | 10.0.x |
 | **PHP** | 8.1 ou superior |
 | **Licença** | GPLv2+ |
@@ -26,6 +26,8 @@ A aba aparece apenas para quem usa a **interface padrão** (não o Self-Service)
 | Título | `SUBCHAMADO - <título original>` (o prefixo não se repete ao clonar um SubChamado) |
 | Descrição, tipo, categoria, urgência, impacto, prioridade, local, origem | Iguais ao original |
 | Requerentes, observadores, técnicos, grupos e fornecedores | Iguais ao original |
+| Quem cria o SubChamado | Incluído como **observador** |
+| Campos adicionais (plugin fields) | Iguais ao original |
 | Acompanhamentos, tarefas, solução e validações | Copiados com **autores e datas originais** |
 | Documentos | **Vinculados** aos mesmos arquivos (sem duplicar no disco) |
 | Ativos e custos | Copiados |
@@ -58,7 +60,7 @@ As opções são constantes em `inc/cloner.class.php`:
 
 ## Limitações conhecidas
 
-- Dados de **outros plugins** (campos adicionais, pesquisas de satisfação etc.) não são copiados.
+- Dados de **outros plugins** (pesquisas de satisfação etc.) não são copiados; os campos adicionais do plugin fields são.
 - Validações pendentes são copiadas como pendentes, sem notificar o validador.
 - O tempo gasto (`actiontime`) é copiado, então aparece somado em dobro nas estatísticas.
 

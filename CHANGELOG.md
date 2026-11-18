@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.0] - 2026-11-18
+### Adicionado
+- Campos adicionais (plugin fields) são copiados do chamado original
+- Quem cria o SubChamado entra como observador
+
 ## [0.5.1] - 2026-10-08
 ### Corrigido
 - Valores copiados do chamado original passam a ser escapados antes de gravar, como faz o clone nativo do GLPI. Antes, um apóstrofo no título, na descrição ou num acompanhamento fazia a criação do SubChamado falhar
